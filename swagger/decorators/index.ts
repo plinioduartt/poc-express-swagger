@@ -1,9 +1,9 @@
 import CustomSwagger from "../index";
 import { SwaggerSetupRoute } from "../types";
 
-export function SetupSwaggerRoute(args: SwaggerSetupRoute) {
+export function SwaggerEndpoint(args: SwaggerSetupRoute) {
   return function (_target: any, _propertyKey: string, _descriptor: PropertyDescriptor) {
-    CustomSwagger.setRoute({
+    CustomSwagger.setEndpoint({
       tag: args.tag,
       url: args.url,
       method: args.method,

@@ -20,7 +20,7 @@ app.post('/users', userController.create.bind(userController))
 app.use('/api-docs',
   swaggerUi.serve,
   swaggerUi.setup(
-    CustomSwagger.getDefaultSwaggerDocument({
+    CustomSwagger.getDocument({
       description: 'Exemplo',
       servers: [
         {

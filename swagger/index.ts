@@ -14,7 +14,7 @@ class CustomSwagger {
     paths: []
   }
 
-  public getDefaultSwaggerDocument(args: SwaggerSetup) {
+  public getDocument(args: SwaggerSetup) {
     this.document.info.description = args.description
     this.document.servers = args.servers
     console.log(this.document)
@@ -22,7 +22,7 @@ class CustomSwagger {
     return this.document
   }
 
-  public setRoute(route: SwaggerSetupRoute): void {
+  public setEndpoint(route: SwaggerSetupRoute): void {
     if (!this.document.tags.some(item => item.name === route.tag)) {
       this.document.tags.push({ name: route.tag })
     }

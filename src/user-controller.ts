@@ -1,12 +1,12 @@
 import { Request, Response } from "express"
-import { SetupSwaggerRoute } from "../swagger/decorators"
+import { SwaggerEndpoint } from "../swagger/decorators"
 import { User } from "./entities"
 import { UsersRepository } from "./repositories"
 
 export class UserController {
   constructor(private repository: UsersRepository) { }
 
-  @SetupSwaggerRoute({
+  @SwaggerEndpoint({
     tag: 'Users',
     url: '/users',
     method: 'GET',
@@ -18,7 +18,7 @@ export class UserController {
     return res.json(users)
   }
 
-  @SetupSwaggerRoute({
+  @SwaggerEndpoint({
     tag: 'Users',
     url: '/users',
     method: 'POST',
