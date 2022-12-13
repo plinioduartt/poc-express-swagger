@@ -1,5 +1,5 @@
 import { name, version } from '../package.json'
-import { CustomSwaggerOptions, SwaggerSetup, SwaggerSetupRoute } from './types'
+import { CustomSwaggerOptions, SwaggerSetup, SwaggerSetupModel, SwaggerSetupRoute } from './types'
 
 class CustomSwagger {
   private document: CustomSwaggerOptions = {
@@ -11,14 +11,14 @@ class CustomSwagger {
     version,
     servers: [],
     tags: [],
-    paths: []
+    paths: [],
+    components: { schemas: {} }
   }
 
   public getDocument(args: SwaggerSetup) {
     this.document.info.description = args.description
     this.document.servers = args.servers
-    console.log(this.document)
-    console.log(this.document.paths[0])
+    console.log(this.document) // TODO: Remover isso
     return this.document
   }
 
@@ -26,6 +26,17 @@ class CustomSwagger {
     if (!this.document.tags.some(item => item.name === route.tag)) {
       this.document.tags.push({ name: route.tag })
     }
+
+    const getBody = (body: any) => ({
+      required: true, // TODO: Fazer ficar flexível
+      content: {
+        CreateUserDto: {
+          schema: {
+            $ref: `#/components/schemas/${body.name}`
+          }
+        }
+      }
+    })
 
     this.document.paths = {
       ...this.document.paths,
@@ -35,10 +46,18 @@ class CustomSwagger {
           tags: [route.tag],
           summary: route.summary,
           description: route.description,
-          parameters: route.parameters,
-          responses: route.responses,
+          requestBody: route.body ? getBody(route.body) : null
+          // parameters: route.parameters,  // TODO: Arrumar
+          // responses: route.responses,  // TODO: Arrumar
         }
       },
+    }
+  }
+
+  public setModel(model: SwaggerSetupModel): void {
+    this.document.components.schemas = {
+      ...this.document.components.schemas,
+      ...model
     }
   }
 }

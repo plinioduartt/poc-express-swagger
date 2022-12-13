@@ -1,5 +1,7 @@
 import { SwaggerOptions } from "swagger-ui-express"
 
+type ValueTypes = 'array' | 'apiKey' | 'integer' | 'oauth2' | 'object' | 'string'
+type Formats = 'binary' | 'datetime' | 'int64' | 'int32'
 export type SwaggerInfos = {
   title: string
   description?: string
@@ -11,22 +13,15 @@ export type SwaggerTag = {
   name: string
 }
 export type SwaggerPath = {
-  [key: string]: any;
-}
-export type SwaggerSetupRoute = {
-  tag: string
-  url: string
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-  summary: string
-  description?: string
+  [key: string]: any
   parameters?: {
     name: string,
     in: 'header' | 'query' | 'path',
-    description: string,
-    required: boolean,
-    explode: boolean,
+    description: string
+    required: boolean
+    explode: boolean
     schema: {
-      type: 'array' | 'apiKey' | 'integer' | 'oauth2' | 'object' | 'string',
+      type: ValueTypes
       items: {
         type: string
       }
@@ -34,7 +29,7 @@ export type SwaggerSetupRoute = {
   }[]
   responses?: {
     [key: string]: {
-      description: string,
+      description: string
       content: {
         [key: string]: {
           schema: {
@@ -46,11 +41,25 @@ export type SwaggerSetupRoute = {
   }
   requestBody?: {
     required: boolean
-    description: string
+    description?: string
     content: {
       [key: string]: {
         schema: {
           $ref: string
+        }
+      }
+    }
+  }
+}
+export type SwaggerComponent = {
+  schemas: {
+    [key: string]: {
+      type: ValueTypes
+      properties: {
+        [key: string]: {
+          type: ValueTypes
+          format: Formats
+          example?: any
         }
       }
     }
@@ -61,7 +70,20 @@ export type SwaggerSetup = {
   servers: SwaggerServer[]
 }
 export type CustomSwaggerOptions = SwaggerOptions & {
-  tags: SwaggerTag[],
-  servers: SwaggerServer[],
-  paths: SwaggerPath,
+  tags: SwaggerTag[]
+  servers: SwaggerServer[]
+  paths: SwaggerPath
+  components: SwaggerComponent
+}
+export type SwaggerSetupRoute = {
+  tag: string
+  url: string
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  summary: string
+  description?: string
+  body?: any
+  response?: any
+}
+export type SwaggerSetupModel = {
+  [key: string]: any
 }

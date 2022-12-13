@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { SwaggerEndpoint } from "../swagger/decorators"
+import { CreateUserDto } from "./dtos"
 import { User } from "./entities"
 import { UsersRepository } from "./repositories"
 
@@ -10,8 +11,7 @@ export class UserController {
     tag: 'Users',
     url: '/users',
     method: 'GET',
-    summary: 'Este é um teste de listagem',
-    responses: {}
+    summary: 'Este é um teste de listagem'
   })
   list(_req: Request, res: Response): Response<User[]> {
     const users = this.repository.list()
@@ -23,10 +23,11 @@ export class UserController {
     url: '/users',
     method: 'POST',
     summary: 'Este é um teste de cadastro',
-    responses: {}
+    body: CreateUserDto
   })
-  create(req: Request, res: Response): Response<void> {
+  create(req: Request<null, null, CreateUserDto>, res: Response): Response<void> {
     const { name } = req.body
+    if (!name) return res.status(400).json({ error: 'Informe um nome.' })
     this.repository.create(name)
     return res.end()
   }
