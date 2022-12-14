@@ -1,5 +1,5 @@
 import { name, version } from '../package.json'
-import { CustomSwaggerOptions, SwaggerSetup, SwaggerSetupModel, SwaggerSetupRoute } from './types'
+import { CustomSwaggerOptions, SwaggerSetup, SwaggerSetupSchema, SwaggerSetupRoute } from './types'
 
 class CustomSwagger {
   private document: CustomSwaggerOptions = {
@@ -42,7 +42,7 @@ class CustomSwagger {
       ...this.document.paths,
       [route.url]: {
         ...this.document.paths[route.url],
-        [route.method.toLocaleLowerCase()]: {
+        [route.method!.toLocaleLowerCase()]: {
           tags: [route.tag],
           summary: route.summary,
           description: route.description,
@@ -54,10 +54,20 @@ class CustomSwagger {
     }
   }
 
-  public setModel(model: SwaggerSetupModel): void {
-    this.document.components.schemas = {
-      ...this.document.components.schemas,
-      ...model
+  public setSchema(name: string, schema: SwaggerSetupSchema): void {
+    if (!this.document.components.schemas[name]) {
+      this.document.components.schemas = {
+        ...this.document.components.schemas,
+        [name]: {
+          ...this.document.components.schemas[name],
+          ...schema
+        }
+      }
+    } else {
+      this.document.components.schemas[name].properties = {
+        ...this.document.components.schemas[name].properties,
+        ...schema.properties
+      }
     }
   }
 }

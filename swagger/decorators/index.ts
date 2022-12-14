@@ -1,45 +1,72 @@
+import 'reflect-metadata'
 import CustomSwagger from "../index";
-import { SwaggerSetupRoute } from "../types";
+import { SwaggerSetupRoute, ValueTypes } from "../types";
 
-export function SwaggerEndpoint(args: SwaggerSetupRoute) {
-  return function (_target: any, _propertyKey: string, _descriptor: PropertyDescriptor): void {
+export function ApiTag(name: string): ClassDecorator {
+  return function (target: any) {
+    Object.defineProperty(target.constructor.prototype, 'tag', {
+      get:() => name
+    })
+    return target
+  };
+}
+
+export function ApiGetEndpoint(args: SwaggerSetupRoute): MethodDecorator {
+  return function (target: any, _propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
+    if (!args.tag) {
+      args.tag = target.constructor.prototype.tag
+    }
+
+    console.log('target no ApiGetEndpoint', target.constructor.prototype.tag)
     CustomSwagger.setEndpoint({
-      tag: args.tag,
-      url: args.url,
-      method: args.method,
-      summary: args.summary,
-      description: args.description,
-      body: args.body,
+      ...args,
+      method: 'GET',
       // parameters: args.parameters,  // TODO: Arrumar
       // responses: args.responses  // TODO: Arrumar
     })
-    console.log(`[SWAGGER] - Endpoint configured successfully ${args.method} - ${args.url}`)
+    console.log(`[SWAGGER] - GET Endpoint configured successfully ${args.method} - ${args.url}`)
   };
 }
 
-export function SwaggerModel() {
-  return function (constructor: any): void {
-    const instance = new constructor()
-    const modelProperties = Object.keys(instance)
-    console.log('instance', instance)
-    console.log('modelProperties', modelProperties)
-    let properties = {}
-    for (let index = 0; index < modelProperties.length; index++) {
-      const prop = modelProperties[index]
-      properties[modelProperties[index]] = {
-        [prop]: {
-          type: typeof instance[prop], // TODO: Arrumar
+export function ApiPostEndpoint(args: SwaggerSetupRoute): MethodDecorator {
+  return function (target: any, _propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
+    if (!args.tag) {
+      args.tag = target.constructor.prototype.tag
+    }
+
+    CustomSwagger.setEndpoint({
+      ...args,
+      method: 'POST',
+      // parameters: args.parameters,  // TODO: Arrumar
+      // responses: args.responses  // TODO: Arrumar
+    })
+    console.log(`[SWAGGER] - POST Endpoint configured successfully ${args.method} - ${args.url}`)
+  };
+}
+
+export function ApiProperty(): PropertyDecorator {
+  return (target: any, key: string | symbol): void => {
+    const schema = target.constructor.name
+    const propType = Reflect.getMetadata('design:type', target, key).name;
+    const schemaType = typeof target.constructor.prototype
+    const mapper = {
+      "string": 'string',
+      "number": 'integer',
+      "bigint": 'integer',
+      "boolean": '',
+      "symbol": '',
+      "undefined": '',
+      "object": 'object',
+      "function": ''
+    }
+    const mappedSchemaType = mapper[schemaType]
+    CustomSwagger.setSchema(schema, {
+      type: mappedSchemaType as ValueTypes,
+      properties: {
+        [key]: {
+          type: propType.toLowerCase(),
         }
       }
-    }
-    console.log('properties => ', properties)
-    CustomSwagger.setModel({
-      [constructor.name]: {
-        type: 'object', // TODO: Arrumar
-        properties: properties
-      }
     })
-    console.log(`[SWAGGER] - Model configured successfully ${constructor.name}`)
-  };
+  }
 }
-

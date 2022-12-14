@@ -1,7 +1,7 @@
 import { SwaggerOptions } from "swagger-ui-express"
 
-type ValueTypes = 'array' | 'apiKey' | 'integer' | 'oauth2' | 'object' | 'string'
-type Formats = 'binary' | 'datetime' | 'int64' | 'int32'
+export type ValueTypes = 'array' | 'apiKey' | 'integer' | 'oauth2' | 'object' | 'string'
+export type Formats = 'binary' | 'datetime' | 'int64' | 'int32'
 export type SwaggerInfos = {
   title: string
   description?: string
@@ -58,7 +58,7 @@ export type SwaggerComponent = {
       properties: {
         [key: string]: {
           type: ValueTypes
-          format: Formats
+          format?: Formats
           example?: any
         }
       }
@@ -78,12 +78,20 @@ export type CustomSwaggerOptions = SwaggerOptions & {
 export type SwaggerSetupRoute = {
   tag: string
   url: string
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   summary: string
   description?: string
-  body?: any
+  body?: unknown
   response?: any
 }
-export type SwaggerSetupModel = {
+export type SwaggerSetupSchema = {
+  type: ValueTypes
+  properties: {
+    [key: string]: {
+      type: ValueTypes 
+      format?: Formats
+      example?: any
+    }
+  }
   [key: string]: any
 }

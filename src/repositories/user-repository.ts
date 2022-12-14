@@ -1,24 +1,16 @@
 import crypto from 'node:crypto'
+import { CreateUserDto } from 'src/dtos'
 import { User } from "src/entities"
 
 export class UsersRepository {
-  private users: User[] = [
-    {
-      id: crypto.randomUUID(),
-      name: 'Plinio Duarte',
-    },
-    {
-      id: crypto.randomUUID(),
-      name: 'Michael Jackson',
-    }
-  ]
+  private users: User[] = []
 
   list(): User[] {
     return this.users
   }
 
-  create(name: string): void {
-    this.users.push({ id: crypto.randomUUID(), name })
+  create(data: CreateUserDto): void {
+    this.users.push({ id: crypto.randomUUID(), ...data })
   }
 }
 

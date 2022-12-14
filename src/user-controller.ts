@@ -1,16 +1,16 @@
 import { Request, Response } from "express"
-import { SwaggerEndpoint } from "../swagger/decorators"
+import { ApiGetEndpoint, ApiPostEndpoint, ApiTag } from "../swagger/decorators"
 import { CreateUserDto } from "./dtos"
 import { User } from "./entities"
 import { UsersRepository } from "./repositories"
 
+@ApiTag('Users')
 export class UserController {
   constructor(private repository: UsersRepository) { }
 
-  @SwaggerEndpoint({
+  @ApiGetEndpoint({
     tag: 'Users',
     url: '/users',
-    method: 'GET',
     summary: 'Este é um teste de listagem'
   })
   list(_req: Request, res: Response): Response<User[]> {
@@ -18,14 +18,17 @@ export class UserController {
     return res.json(users)
   }
 
-  @SwaggerEndpoint({
+  @ApiPostEndpoint({
     tag: 'Users',
     url: '/users',
-    method: 'POST',
     summary: 'Este é um teste de cadastro',
-    body: CreateUserDto
+    body: CreateUserDto // TODO: Adicionar validações
+    // response: 200 // TODO: Adicionar
+    // bearerAuth: // TODO: Adicionar
+    // parameters: 200 // TODO: Adicionar
+    // headers: 200 // TODO: Adicionar
   })
-  create(req: Request<null, null, CreateUserDto>, res: Response): Response<void> {
+  create(req: Request, res: Response): Response<void> {
     const { name } = req.body
     if (!name) return res.status(400).json({ error: 'Informe um nome.' })
     this.repository.create(name)
