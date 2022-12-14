@@ -76,7 +76,7 @@ export type CustomSwaggerOptions = SwaggerOptions & {
   components: SwaggerComponent
 }
 export type SwaggerSetupRoute = {
-  tag: string
+  tag?: string
   url: string
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   summary: string

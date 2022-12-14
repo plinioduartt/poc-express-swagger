@@ -1,23 +1,31 @@
 import 'reflect-metadata'
 import CustomSwagger from "../index";
 import { SwaggerSetupRoute, ValueTypes } from "../types";
+import crypto from 'node:crypto'
 
-export function ApiTag(name: string): ClassDecorator {
+export function ApiTag(tag: string): ClassDecorator {
   return function (target: any) {
-    Object.defineProperty(target.constructor.prototype, 'tag', {
-      get:() => name
-    })
+    // Object.defineProperty(target.constructor.prototype, 'tag', {
+    //   get: () => tag
+    // })
+    const metadataKey = target.name
+    const defaultValue = Reflect.getMetadata(metadataKey, target.prototype)
+    console.log(defaultValue.tag)
+    CustomSwagger.updateTags(target.name, defaultValue.tag, tag)
     return target
   };
 }
 
 export function ApiGetEndpoint(args: SwaggerSetupRoute): MethodDecorator {
-  return function (target: any, _propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
+  return function (target: any, propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
+
     if (!args.tag) {
-      args.tag = target.constructor.prototype.tag
+      const defaultTag = crypto.randomUUID()
+      const metadataKey = target.constructor.name
+      args.tag = defaultTag
+      Reflect.defineMetadata(metadataKey, { tag: defaultTag }, target)
     }
 
-    console.log('target no ApiGetEndpoint', target.constructor.prototype.tag)
     CustomSwagger.setEndpoint({
       ...args,
       method: 'GET',

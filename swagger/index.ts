@@ -1,5 +1,5 @@
 import { name, version } from '../package.json'
-import { CustomSwaggerOptions, SwaggerSetup, SwaggerSetupSchema, SwaggerSetupRoute } from './types'
+import { CustomSwaggerOptions, SwaggerSetup, SwaggerSetupSchema, SwaggerSetupRoute, SwaggerTag } from './types'
 
 class CustomSwagger {
   private document: CustomSwaggerOptions = {
@@ -23,9 +23,7 @@ class CustomSwagger {
   }
 
   public setEndpoint(route: SwaggerSetupRoute): void {
-    if (!this.document.tags.some(item => item.name === route.tag)) {
-      this.document.tags.push({ name: route.tag })
-    }
+    this.setTag(route.tag!)
 
     const getBody = (body: any) => ({
       required: true, // TODO: Fazer ficar flexível
@@ -69,6 +67,18 @@ class CustomSwagger {
         ...schema.properties
       }
     }
+  }
+
+  public setTag(name: string) {
+    if (!this.document.tags.some(item => item.name === name)) {
+      this.document.tags.push({ name })
+    }
+  }
+
+  public updateTags(constructorName: string, defaultTag: string, tag: string) {
+    Object.keys(this.document.paths)
+    this.document.tags.splice(this.document.tags.indexOf((item: SwaggerTag) => item.name === defaultTag), 1)
+    this.document.tags.push({ name: tag })
   }
 }
 

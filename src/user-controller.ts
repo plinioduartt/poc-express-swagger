@@ -9,7 +9,6 @@ export class UserController {
   constructor(private repository: UsersRepository) { }
 
   @ApiGetEndpoint({
-    tag: 'Users',
     url: '/users',
     summary: 'Este é um teste de listagem'
   })
@@ -19,7 +18,6 @@ export class UserController {
   }
 
   @ApiPostEndpoint({
-    tag: 'Users',
     url: '/users',
     summary: 'Este é um teste de cadastro',
     body: CreateUserDto // TODO: Adicionar validações
