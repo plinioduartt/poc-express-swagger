@@ -1,5 +1,6 @@
 import { name, version } from '../package.json'
-import { CustomSwaggerOptions, SwaggerSetup, SwaggerSetupSchema, SwaggerSetupRoute, SwaggerTag } from './types'
+import { TypesMapper } from './helpers'
+import { CustomSwaggerOptions, SwaggerSetup, SwaggerSetupSchema, SwaggerSetupRoute, SwaggerTag, SwaggerParameter, SwaggerResponse } from './types'
 
 class CustomSwagger {
   private document: CustomSwaggerOptions = {
@@ -11,7 +12,7 @@ class CustomSwagger {
     version,
     servers: [],
     tags: [],
-    paths: [],
+    paths: {},
     components: { schemas: {} }
   }
 
@@ -28,12 +29,30 @@ class CustomSwagger {
     const getBody = (body: any) => ({
       required: true, // TODO: Fazer ficar flexível
       content: {
-        CreateUserDto: {
+        [body.name]: {
           schema: {
             $ref: `#/components/schemas/${body.name}`
           }
         }
       }
+    })
+
+    const responses: SwaggerResponse = {}
+    route.responses?.forEach((response) => {
+      Object.assign(responses, {
+        ...responses,
+        [response.status]: {
+          description: response.description,
+          content: response.schema! ? {
+            [response.type! ?? 'application/json']: {
+              schema: {
+                type: TypesMapper(typeof response.schema),
+                $ref: `#/components/schemas/${response.schema?.name}`,
+              }
+            }
+          } : undefined
+        }
+      })
     })
 
     this.document.paths = {
@@ -44,9 +63,23 @@ class CustomSwagger {
           tags: [route.tag],
           summary: route.summary,
           description: route.description,
-          requestBody: route.body ? getBody(route.body) : null
-          // parameters: route.parameters,  // TODO: Arrumar
-          // responses: route.responses,  // TODO: Arrumar
+          requestBody: route.body ? getBody(route.body) : null,
+          parameters: route.parameters ? route.parameters.map((param): SwaggerParameter => {
+            return {
+              name: param.name,
+              in: param.in,
+              description: param.description ?? '',
+              required: param.required ?? true,
+              explode: param.explode ?? false,
+              schema: {
+                type: param.type,
+                items: {
+                  type: param.type
+                }
+              }
+            }
+          }) : [],
+          responses
         }
       },
     }
@@ -89,8 +122,6 @@ class CustomSwagger {
             tags: methodObj.tags
           })
         }
-       
-        console.log(methodObj)
       })
     })
     this.document.tags.splice(this.document.tags.indexOf((item: SwaggerTag) => item.name === defaultTag))
