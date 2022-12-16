@@ -75,9 +75,26 @@ class CustomSwagger {
     }
   }
 
-  public updateTags(constructorName: string, defaultTag: string, tag: string) {
-    Object.keys(this.document.paths)
-    this.document.tags.splice(this.document.tags.indexOf((item: SwaggerTag) => item.name === defaultTag), 1)
+  public updateTags(defaultTag: string, tag: string) {
+    const paths = Object.keys(this.document.paths)
+    paths.forEach(path => {
+      const methods = Object.keys(this.document.paths[path])
+      methods.forEach(method => {
+        const methodObj = this.document.paths[path][method]
+        const indexToUpdate = methodObj.tags.indexOf(undefined)
+        if (indexToUpdate !== -1) {
+          methodObj.tags[indexToUpdate] = tag
+          Object.assign(methodObj, {
+            ...methodObj,
+            tags: methodObj.tags
+          })
+        }
+       
+        console.log(methodObj)
+      })
+    })
+    this.document.tags.splice(this.document.tags.indexOf((item: SwaggerTag) => item.name === defaultTag))
+    this.document.tags = this.document.tags.filter(item => item.name !== undefined)
     this.document.tags.push({ name: tag })
   }
 }

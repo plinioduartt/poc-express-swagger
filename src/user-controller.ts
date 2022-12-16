@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { ApiGetEndpoint, ApiPostEndpoint, ApiTag } from "../swagger/decorators"
+import { ApiDeleteEndpoint, ApiGetEndpoint, ApiPatchEndpoint, ApiPostEndpoint, ApiPutEndpoint, ApiTag } from "../swagger/decorators"
 import { CreateUserDto } from "./dtos"
 import { User } from "./entities"
 import { UsersRepository } from "./repositories"
@@ -18,13 +18,10 @@ export class UserController {
   }
 
   @ApiPostEndpoint({
+    tag: 'Teste',
     url: '/users',
     summary: 'Este é um teste de cadastro',
-    body: CreateUserDto // TODO: Adicionar validações
-    // response: 200 // TODO: Adicionar
-    // bearerAuth: // TODO: Adicionar
-    // parameters: 200 // TODO: Adicionar
-    // headers: 200 // TODO: Adicionar
+    body: CreateUserDto
   })
   create(req: Request, res: Response): Response<void> {
     const { name } = req.body

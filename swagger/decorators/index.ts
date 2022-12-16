@@ -1,29 +1,24 @@
+import { isBefore } from 'date-fns';
 import 'reflect-metadata'
 import CustomSwagger from "../index";
 import { SwaggerSetupRoute, ValueTypes } from "../types";
-import crypto from 'node:crypto'
 
 export function ApiTag(tag: string): ClassDecorator {
   return function (target: any) {
-    // Object.defineProperty(target.constructor.prototype, 'tag', {
-    //   get: () => tag
-    // })
     const metadataKey = target.name
     const defaultValue = Reflect.getMetadata(metadataKey, target.prototype)
-    console.log(defaultValue.tag)
-    CustomSwagger.updateTags(target.name, defaultValue.tag, tag)
+    CustomSwagger.updateTags(defaultValue.tag, tag)
     return target
   };
 }
 
 export function ApiGetEndpoint(args: SwaggerSetupRoute): MethodDecorator {
-  return function (target: any, propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
+  return function (target: any, _propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
 
     if (!args.tag) {
-      const defaultTag = crypto.randomUUID()
       const metadataKey = target.constructor.name
-      args.tag = defaultTag
-      Reflect.defineMetadata(metadataKey, { tag: defaultTag }, target)
+      args.tag = undefined
+      Reflect.defineMetadata(metadataKey, { tag: undefined }, target)
     }
 
     CustomSwagger.setEndpoint({
@@ -49,6 +44,54 @@ export function ApiPostEndpoint(args: SwaggerSetupRoute): MethodDecorator {
       // responses: args.responses  // TODO: Arrumar
     })
     console.log(`[SWAGGER] - POST Endpoint configured successfully ${args.method} - ${args.url}`)
+  };
+}
+
+export function ApiPutEndpoint(args: SwaggerSetupRoute): MethodDecorator {
+  return function (target: any, _propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
+    if (!args.tag) {
+      args.tag = target.constructor.prototype.tag
+    }
+
+    CustomSwagger.setEndpoint({
+      ...args,
+      method: 'PUT',
+      // parameters: args.parameters,  // TODO: Arrumar
+      // responses: args.responses  // TODO: Arrumar
+    })
+    console.log(`[SWAGGER] - PUT Endpoint configured successfully ${args.method} - ${args.url}`)
+  };
+}
+
+export function ApiPatchEndpoint(args: SwaggerSetupRoute): MethodDecorator {
+  return function (target: any, _propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
+    if (!args.tag) {
+      args.tag = target.constructor.prototype.tag
+    }
+
+    CustomSwagger.setEndpoint({
+      ...args,
+      method: 'PATCH',
+      // parameters: args.parameters,  // TODO: Arrumar
+      // responses: args.responses  // TODO: Arrumar
+    })
+    console.log(`[SWAGGER] - PATCH Endpoint configured successfully ${args.method} - ${args.url}`)
+  };
+}
+
+export function ApiDeleteEndpoint(args: SwaggerSetupRoute): MethodDecorator {
+  return function (target: any, _propertyKey: string | symbol, _descriptor: PropertyDescriptor): void {
+    if (!args.tag) {
+      args.tag = target.constructor.prototype.tag
+    }
+
+    CustomSwagger.setEndpoint({
+      ...args,
+      method: 'DELETE',
+      // parameters: args.parameters,  // TODO: Arrumar
+      // responses: args.responses  // TODO: Arrumar
+    })
+    console.log(`[SWAGGER] - DELETE Endpoint configured successfully ${args.method} - ${args.url}`)
   };
 }
 
