@@ -27,11 +27,11 @@ class CustomSwagger {
     this.setTag(route.tag!)
 
     const getBody = (body: any) => ({
-      required: true, // TODO: Fazer ficar flexível
+      required: body.required ?? true, 
       content: {
-        [body.name]: {
+        [body.schema.name]: {
           schema: {
-            $ref: `#/components/schemas/${body.name}`
+            $ref: `#/components/schemas/${body.schema.name}`
           }
         }
       }
@@ -73,9 +73,6 @@ class CustomSwagger {
               explode: param.explode ?? false,
               schema: {
                 type: param.type,
-                items: {
-                  type: param.type
-                }
               }
             }
           }) : [],

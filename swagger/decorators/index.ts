@@ -1,9 +1,9 @@
 import 'reflect-metadata'
 import { TypesMapper } from '../../swagger/helpers';
 import CustomSwagger from "../index";
-import { SwaggerSetupRoute, ValueTypes } from "../types";
+import { SwaggerApiPropertyArgs, SwaggerSetupRoute, ValueTypes } from "../types";
 
-export function ApiTag(tag: string): ClassDecorator {
+export function CommonApiTag(tag: string): ClassDecorator {
   return function (target: any) {
     const metadataKey = target.name
     const defaultValue = Reflect.getMetadata(metadataKey, target.prototype)
@@ -24,10 +24,10 @@ export function ApiGetEndpoint(args: SwaggerSetupRoute): MethodDecorator {
     CustomSwagger.setEndpoint({
       ...args,
       method: 'GET',
-      parameters: args.parameters, 
+      parameters: args.parameters,
       responses: args.responses
     })
-    console.log(`[SWAGGER] - GET Endpoint configured successfully ${args.method} - ${args.url}`)
+    console.info(`[SWAGGER] - GET Endpoint configured successfully - ${args.url}`)
   };
 }
 
@@ -40,10 +40,10 @@ export function ApiPostEndpoint(args: SwaggerSetupRoute): MethodDecorator {
     CustomSwagger.setEndpoint({
       ...args,
       method: 'POST',
-      parameters: args.parameters, 
-      // responses: args.responses  // TODO: Arrumar
+      parameters: args.parameters,
+      responses: args.responses
     })
-    console.log(`[SWAGGER] - POST Endpoint configured successfully ${args.method} - ${args.url}`)
+    console.info(`[SWAGGER] - POST Endpoint configured successfully - ${args.url}`)
   };
 }
 
@@ -56,10 +56,10 @@ export function ApiPutEndpoint(args: SwaggerSetupRoute): MethodDecorator {
     CustomSwagger.setEndpoint({
       ...args,
       method: 'PUT',
-      parameters: args.parameters, 
-      // responses: args.responses  // TODO: Arrumar
+      parameters: args.parameters,
+      responses: args.responses
     })
-    console.log(`[SWAGGER] - PUT Endpoint configured successfully ${args.method} - ${args.url}`)
+    console.info(`[SWAGGER] - PUT Endpoint configured successfully - ${args.url}`)
   };
 }
 
@@ -72,10 +72,10 @@ export function ApiPatchEndpoint(args: SwaggerSetupRoute): MethodDecorator {
     CustomSwagger.setEndpoint({
       ...args,
       method: 'PATCH',
-      parameters: args.parameters, 
-      // responses: args.responses  // TODO: Arrumar
+      parameters: args.parameters,
+      responses: args.responses
     })
-    console.log(`[SWAGGER] - PATCH Endpoint configured successfully ${args.method} - ${args.url}`)
+    console.info(`[SWAGGER] - PATCH Endpoint configured successfully - ${args.url}`)
   };
 }
 
@@ -88,14 +88,14 @@ export function ApiDeleteEndpoint(args: SwaggerSetupRoute): MethodDecorator {
     CustomSwagger.setEndpoint({
       ...args,
       method: 'DELETE',
-      parameters: args.parameters, 
-      // responses: args.responses  // TODO: Arrumar
+      parameters: args.parameters,
+      responses: args.responses
     })
-    console.log(`[SWAGGER] - DELETE Endpoint configured successfully ${args.method} - ${args.url}`)
+    console.info(`[SWAGGER] - DELETE Endpoint configured successfully - ${args.url}`)
   };
 }
 
-export function ApiProperty(): PropertyDecorator {
+export function ApiProperty(args?: SwaggerApiPropertyArgs): PropertyDecorator {
   return (target: any, key: string | symbol): void => {
     const schema = target.constructor.name
     const propType = Reflect.getMetadata('design:type', target, key).name;
@@ -106,6 +106,7 @@ export function ApiProperty(): PropertyDecorator {
       properties: {
         [key]: {
           type: propType.toLowerCase(),
+          example: args?.example
         }
       }
     })

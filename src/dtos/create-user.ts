@@ -1,7 +1,7 @@
 import { ApiProperty } from "../../swagger/decorators";
 
 export class CreateUserDto {
-  @ApiProperty()
+  @ApiProperty({ example: 'Plinio Duarte' })
   name!: string; // TODO: Revisitar
 
   @ApiProperty()

@@ -1,10 +1,12 @@
 import { Request, Response } from "express"
-import { ApiDeleteEndpoint, ApiGetEndpoint, ApiPatchEndpoint, ApiPostEndpoint, ApiPutEndpoint, ApiTag } from "../swagger/decorators"
+import { ApiGetEndpoint, ApiPostEndpoint, CommonApiTag } from "../swagger/decorators"
+import { HttpStatus } from "../swagger/types"
 import { CreatedUserResponseDto, CreateUserDto } from "./dtos"
 import { User } from "./entities"
+import { BadRequestException } from "./errors"
 import { UsersRepository } from "./repositories"
 
-@ApiTag('Users')
+@CommonApiTag('Users')
 export class UserController {
   constructor(private repository: UsersRepository) { }
 
@@ -27,29 +29,32 @@ export class UserController {
       {
         status: 200,
         description: 'success operation',
-        type: 'application/json', // TODO: Melhorar isso
         schema: CreatedUserResponseDto,
       },
       {
         status: 400,
-        description: 'Teste de erro',
+        description: 'error operation',
+        schema: BadRequestException
       }
     ]
   })
   list(_req: Request, res: Response): Response<User[]> {
     const users = this.repository.list()
     return res.json(users)
+
   }
 
   @ApiPostEndpoint({
-    tag: 'Teste',
+    tag: 'Optional unique tag test',
     url: '/users',
     summary: 'Este é um teste de cadastro',
-    body: CreateUserDto,
+    body: {
+      schema: CreateUserDto
+    },
     responses: [
       {
-        status: 201,
-        description: 'success operation',
+        status: HttpStatus.CREATED,
+        description: 'Success operation',
         schema: CreatedUserResponseDto,
       }
     ]
